@@ -31,7 +31,10 @@ class Cell:
         Raises:
             InvalidCellValueError: if value not in [0, 9].
         """
-        pass
+
+        self.value = value
+        self.row = row
+        self.col = col
 
     @property
     def value(self) -> int:
@@ -40,7 +43,8 @@ class Cell:
         Returns:
             int: the value inside the cell.
         """
-        pass
+
+        return self._value
 
     @value.setter
     def value(self, new_val: int) -> None:
@@ -52,10 +56,16 @@ class Cell:
         Raises:
             InvalidCellValueError: if value not in [0, 9].
         """
-        pass
+
+        if new_val < 0 or new_val > 9:
+            raise InvalidCellValueError(
+                "a cell cannot contains values which are not in [0, 9]."
+            )
+        else:
+            self._value = new_val
 
     def __repr__(self) -> str:
-        pass
+        return str(self._value)
 
 
 class Board:
