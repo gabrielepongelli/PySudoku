@@ -25,6 +25,8 @@ class Cell:
 
         Args:
             value (int): new value to put inside this cell. Must be in [0, 9].
+            row (int): row number of this cell.
+            col (int): col number of this cell.
 
         Raises:
             InvalidCellValueError: if value not in [0, 9].
@@ -149,7 +151,7 @@ class Solver:
         """Initialize a new Solver.
 
         Args:
-            grid (Board): board to solve.
+            board (Board): board to solve.
         """
         pass
 
