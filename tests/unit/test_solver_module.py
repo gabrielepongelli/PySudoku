@@ -11,7 +11,7 @@ def init_cell_data(func):
     wraps(func)
 
     def wrapper(self, *args, **kwargs):
-        if self.args == None or self.cell == None:
+        if (not hasattr(self, "args")) or (not hasattr(self, "cell")):
             self.args = {"value": 2, "row": 3, "col": 4}
             self.cell = sol.Cell(**self.args)
         return func(self, *args, **kwargs)
@@ -93,7 +93,7 @@ def init_board_data(func):
     wraps(func)
 
     def wrapper(self, *args, **kwargs):
-        if self.matrix == None or self.board == None:
+        if (not hasattr(self, "matrix")) or (not hasattr(self, "board")):
             temp_matrix = init_random_matrix()
             self.matrix = []
             self.board = sol.Board()
