@@ -68,7 +68,7 @@ class Cell:
         return self.row == other.row and self.col == other.col
 
     def __repr__(self) -> str:
-        return str(self._value)
+        return repr(self._value)
 
 
 class Board:
@@ -90,9 +90,36 @@ class Board:
             Board: the board equivalent to the matrix specified.
         """
 
+        result = cls()
+        board = result.rows()
+        for i, row in enumerate(board):
+            for j, cell in enumerate(row):
+                cell.value = matrix[i][j]
+        return result
+
     def __init__(self) -> None:
         """Initialize a new Board."""
-        pass
+
+        self._rows = []
+        self._cols = []
+        self._squares = []
+
+        for i in range(0, 9):
+            self._rows.append([])
+            for j in range(0, 9):
+                # rows
+                cell = Cell(0, i, j)
+                self._rows[i].append(cell)
+
+                # cols
+                if i == 0:
+                    self._cols.append([])
+                self._cols[j].append(cell)
+
+                # squares
+                if j % 3 == 0 and i % 3 == 0:
+                    self._squares.append([])
+                self._squares[(j // 3) * ((i // 3) + 1)].append(cell)
 
     def get_cells(
         self, used: bool = True, row: int = None, col: int = None
@@ -113,7 +140,34 @@ class Board:
         Returns:
             List[Cell]: the specified cells of this board.
         """
-        pass
+
+        result = None
+        if row is not None:
+            result = list(self._rows[row])
+
+        if col is not None:
+            if result is not None:
+                result = [cell for cell in result if cell.col == col]
+            else:
+                result = list(self._cols[col])
+
+        test = lambda x: (x.value != 0) if used else (x.value == 0)
+        if result is not None:
+            result = [cell for cell in result if test(cell)]
+        else:
+            result = [cell for col in self._rows for cell in col if test(cell)]
+
+        return result
+
+    @staticmethod
+    def _copy_matrix(matrix: List[List[object]]) -> List[List[object]]:
+        """Create a new matrix."""
+
+        result = []
+        for item in matrix:
+            result.append(list(item))
+
+        return result
 
     def rows(self) -> List[List[Cell]]:
         """Get all the cells by row.
@@ -121,7 +175,8 @@ class Board:
         Returns:
             List[List[Cell]]: all the cells in the order row[ col ].
         """
-        pass
+
+        return Board._copy_matrix(self._rows)
 
     def cols(self) -> List[List[Cell]]:
         """Get all the cells by col.
@@ -129,7 +184,8 @@ class Board:
         Returns:
             List[List[Cell]]: all the cells in the order col[ row ].
         """
-        pass
+
+        return Board._copy_matrix(self._cols)
 
     def squares(self) -> List[List[Cell]]:
         """Get all the cells by squares.
@@ -139,7 +195,8 @@ class Board:
         Returns:
             List[List[Cell]]: all the cells grouped into squares.
         """
-        pass
+
+        return Board._copy_matrix(self._squares)
 
     def to_matrix(self) -> List[List[int]]:
         """Get the matrix representation of the board.
@@ -147,10 +204,15 @@ class Board:
         Returns:
             List[List[int]]: the matrix representation.
         """
-        pass
+
+        result = []
+        for row in self._rows:
+            result.append([cell.value for cell in row])
+
+        return result
 
     def __repr__(self) -> str:
-        pass
+        return str(self._rows)
 
 
 class Solver:
