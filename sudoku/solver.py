@@ -64,6 +64,9 @@ class Cell:
         else:
             self._value = new_val
 
+    def __eq__(self, other: "Cell") -> bool:
+        return self.row == other.row and self.col == other.col
+
     def __repr__(self) -> str:
         return str(self._value)
 

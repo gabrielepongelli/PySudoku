@@ -1,14 +1,19 @@
-from functools import wraps
 import pytest
+from functools import wraps
+from random import randrange
+
+
 import sudoku.solver as sol
 
 
 def init_cell_data(func):
+    """Decorator that initialize some data for the tests of the class Cell."""
     wraps(func)
 
     def wrapper(self, *args, **kwargs):
-        self.args = {"value": 2, "row": 3, "col": 4}
-        self.cell = sol.Cell(**self.args)
+        if self.args == None or self.cell == None:
+            self.args = {"value": 2, "row": 3, "col": 4}
+            self.cell = sol.Cell(**self.args)
         return func(self, *args, **kwargs)
 
     return wrapper
@@ -44,7 +49,7 @@ class TestCellClass:
 
     @init_cell_data
     def test_value_setter(self):
-        """Test the setter method fot the value property of the class Cell."""
+        """Test the setter method for the value property of the class Cell."""
 
         self.cell.value = self.args["value"] + 1
 
@@ -55,3 +60,16 @@ class TestCellClass:
 
         with pytest.raises(sol.InvalidCellValueError):
             self.cell.value = 10
+
+    @init_cell_data
+    def test_eq(self):
+        """Test the __eq__ method of the class Cell."""
+
+        test = sol.Cell(self.args["value"], self.args["row"] + 1, self.args["col"])
+        assert not (self.cell == test)
+
+        test = sol.Cell(self.args["value"], self.args["row"], self.args["col"] + 1)
+        assert not (self.cell == test)
+
+        test = sol.Cell(self.args["value"] + 1, self.args["row"], self.args["col"])
+        assert self.cell == test
