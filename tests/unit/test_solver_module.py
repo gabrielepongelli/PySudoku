@@ -78,10 +78,10 @@ class TestCellClass:
 def init_random_matrix():
     """Initialize a matrix 9x9 of random values in [0, 9]."""
 
-    tmp_range = range(0, 10)
+    tmp_range = range(0, 9)
 
     matrix = []
-    for row in tmp_range:
+    for _ in tmp_range:
         matrix.append([randrange(0, 10) for _ in tmp_range])
 
     return matrix
@@ -97,11 +97,11 @@ def init_board_data(func):
             temp_matrix = init_random_matrix()
             self.matrix = []
             self.board = sol.Board()
-            for i, row in enumerate(self.board.rows()):
+            for i, row in enumerate(self.board._rows):
                 self.matrix.append([])
                 for j, cell in enumerate(row):
                     cell.value = temp_matrix[i][j]
-                    self.matrix[i][j] = sol.Cell(cell.value, cell.row, cell.col)
+                    self.matrix[i].append(sol.Cell(cell.value, cell.row, cell.col))
 
         return func(self, *args, **kwargs)
 
@@ -155,14 +155,14 @@ class TestBoardClass:
         assert self.board.get_cells(used=False) == test
 
         # test row cells
-        row = 3
+        rows = 3
         test = [
             cell
             for row in self.matrix
             for cell in row
-            if (cell.row == row and cell.value != 0)
+            if (cell.row == rows and cell.value != 0)
         ]
-        assert self.board.get_cells(row=row) == test
+        assert self.board.get_cells(row=rows) == test
 
         # test col cells
         col = 3
@@ -175,15 +175,15 @@ class TestBoardClass:
         assert self.board.get_cells(col=col) == test
 
         # test row and col cells
-        row = 4
+        rows = 4
         col = 3
         test = [
             cell
             for row in self.matrix
             for cell in row
-            if (cell.col == col and cell.row == row and cell.value != 0)
+            if (cell.col == col and cell.row == rows and cell.value != 0)
         ]
-        assert self.board.get_cells(row=row, col=col) == test
+        assert self.board.get_cells(row=rows, col=col) == test
 
     @init_board_data
     def test_rows(self):
