@@ -207,6 +207,46 @@ class RulesTranslator(CnfTranslator):
         return self.result
 
 
+class InstanceTranslator(CnfTranslator):
+    """Translator of sudoku instances."""
+
+    def _cell_to_literal(self, cell: Cell) -> Literal:
+        """Translate the given cell into literal.
+
+        Args:
+            cell (Cell): cell to translate.
+
+        Returns:
+            Literal: the equivalent literal.
+        """
+
+        return self._coord_to_literal(cell.row, cell.col, cell.value - 1)
+
+    def _translate_instance(self) -> None:
+        """Translate all the values already present in the board into constraints."""
+
+        for cell in self._board.get_cells():
+            if cell.value != 0:
+                self.result.append([self._cell_to_literal(cell)])
+
+    def translate(self, board: Board) -> Formula:
+        """Translate the given game instance into the equivalent CNF formula.
+
+        Args:
+            board (Board): board to translate.
+
+        Returns:
+            Formula: a CNF formula equivalent to the instance of the board given.
+        """
+
+        self._board = board
+        self.result = []
+
+        self._translate_instance()
+
+        return self.result
+
+
 class ResultTranslator(Translator):
     """Translator of sat solver results into sudoku boards."""
 
