@@ -1,16 +1,5 @@
 from typing import List
-
-
-class SudokuError(Exception):
-    """Base exception of the Sudoku package."""
-
-    pass
-
-
-class InvalidCellValueError(SudokuError, ValueError):
-    """Exception raised when trying to set a wrong value to a cell."""
-
-    pass
+from utils import InvalidCellValueError
 
 
 class Cell:
@@ -79,6 +68,11 @@ class Board:
     A well defined sudoku board is a grid of 9x9 cells.
     """
 
+    N_ROWS = 9
+    N_COLS = 9
+    N_SQUARES = 9
+    VALUE_RANGE = (0, 9)
+
     @classmethod
     def from_matrix(cls, matrix: List[List[int]]) -> "Board":
         """Build a Board from the given matrix.
@@ -104,18 +98,12 @@ class Board:
     def __init__(self, rows: int, col: int) -> None:
         """Initialize a new Board."""
 
-        self.N_ROWS = 9
-        self.N_COLS = 9
-        self.N_SQUARES = 9
-        self.VALUE_RANGE = (0, 9)
-
         self._rows = []
         self._cols = []
-        self._squares = []
 
-        for i in range(0, 9):
+        for i in range(0, Board.N_ROWS):
             self._rows.append([])
-            for j in range(0, 9):
+            for j in range(0, Board.N_COLS):
                 # rows
                 cell = Cell(0, i, j)
                 self._rows[i].append(cell)
@@ -124,11 +112,6 @@ class Board:
                 if i == 0:
                     self._cols.append([])
                 self._cols[j].append(cell)
-
-                # squares
-                if j % 3 == 0 and i % 3 == 0:
-                    self._squares.append([])
-                self._squares[(j // 3) * ((i // 3) + 1)].append(cell)
 
     def get_cells(
         self, used: bool = True, row: int = None, col: int = None
@@ -187,26 +170,6 @@ class Board:
 
         return Board._copy_matrix(self._rows)
 
-    def cols(self) -> List[List[Cell]]:
-        """Get all the cells by col.
-
-        Returns:
-            List[List[Cell]]: all the cells in the order col[ row ].
-        """
-
-        return Board._copy_matrix(self._cols)
-
-    def squares(self) -> List[List[Cell]]:
-        """Get all the cells by squares.
-
-        Get all the cells by squares. Each square is in the format row1, row2, row3.
-
-        Returns:
-            List[List[Cell]]: all the cells grouped into squares.
-        """
-
-        return Board._copy_matrix(self._squares)
-
     def to_matrix(self) -> List[List[int]]:
         """Get the matrix representation of the board.
 
@@ -221,4 +184,4 @@ class Board:
         return result
 
     def __repr__(self) -> str:
-        return str(self._rows)
+        return repr(self._rows)
