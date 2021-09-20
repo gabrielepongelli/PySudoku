@@ -21,8 +21,7 @@ class Translator(ABC):
     """Common interface for a translator class.
 
     This is a common interface for a translator class. A translator is a class
-    that translate something into CNF formulas ready for being processed by a
-    sat solver.
+    that translate something into an equivalent version of something else.
     """
 
     @staticmethod
@@ -39,27 +38,31 @@ class Translator(ABC):
             return InstanceTranslator()
 
     @abstractmethod
-    def translate(self, obj: object) -> Formula:
-        """Translate the given object into the equivalent CNF formula.
+    def translate(self, obj: object) -> object:
+        """Translate the given object into some other equivalent object.
 
         Args:
             obj (object): object to translate.
 
         Returns:
-            Formula: a CNF formula equivalent to the object given.
+            object: the equivalent obj translation.
         """
         pass
 
 
-class BoardTranslator(Translator):
-    """Translator of sudoku boards."""
+class CnfTranslator(Translator):
+    """Translator of sudoku boards into CNF formulas.
+
+    This is a Translator of sudoku boards into CNF formulas ready for being
+    processed by a sat solver.
+    """
 
     def __init__(self) -> None:
         """Initialize a new BoardTranslator."""
 
         super().__init__()
-        self._board = None
-        self.result = None
+        self._board: Board = None
+        self.result: Formula = None
 
     def _coord_to_literal(self, row: int, col: int, value: int) -> Literal:
         """Translate the given coordinates into literal.
@@ -77,8 +80,12 @@ class BoardTranslator(Translator):
         row_coefficent = col_coefficent * self._board.N_COLS
         return value + (col_coefficent * col) + (row_coefficent * row)
 
+    @abstractmethod
+    def translate(self, board: Board) -> Formula:
+        pass
 
-class RulesTranslator(BoardTranslator):
+
+class RulesTranslator(CnfTranslator):
     """Translator of sudoku rules."""
 
     def _uniqueness(
@@ -126,10 +133,7 @@ class RulesTranslator(BoardTranslator):
         args = {
             "range_first": (0, self._board.N_ROWS),
             "range_second": (0, self._board.N_COLS),
-            "range_variable": (
-                self._board.VALUE_RANGE[0] + 1,
-                self._board.VALUE_RANGE[1] + 1,
-            ),
+            "range_variable": self._board.VALUE_RANGE,
             "map_to_coord": lambda x, y, z: (x, y, z),
         }
 
@@ -139,10 +143,7 @@ class RulesTranslator(BoardTranslator):
         """Add to the result formula constraints for the columns values."""
 
         args = {
-            "range_first": (
-                self._board.VALUE_RANGE[0] + 1,
-                self._board.VALUE_RANGE[1] + 1,
-            ),
+            "range_first": self._board.VALUE_RANGE,
             "range_second": (0, self._board.N_COLS),
             "range_variable": (0, self._board.N_ROWS),
             "map_to_coord": lambda x, y, z: (z, y, x),
@@ -154,10 +155,7 @@ class RulesTranslator(BoardTranslator):
         """Add to the result formula constraints for the rows values."""
 
         args = {
-            "range_first": (
-                self._board.VALUE_RANGE[0] + 1,
-                self._board.VALUE_RANGE[1] + 1,
-            ),
+            "range_first": self._board.VALUE_RANGE,
             "range_second": (0, self._board.N_ROWS),
             "range_variable": (0, self._board.N_COLS),
             "map_to_coord": lambda x, y, z: (y, z, x),
@@ -173,10 +171,7 @@ class RulesTranslator(BoardTranslator):
         col = lambda square: square % sqrt(n_cells_per_square)
 
         args = {
-            "range_first": (
-                self._board.VALUE_RANGE[0] + 1,
-                self._board.VALUE_RANGE[1] + 1,
-            ),
+            "range_first": self._board.VALUE_RANGE,
             "range_second": (0, self._board.N_SQUARES),
             "range_variable": (0, n_cells_per_square),
             "map_to_coord": lambda x, y, z: (
@@ -209,7 +204,7 @@ class RulesTranslator(BoardTranslator):
         return self.result
 
 
-class InstanceTranslator(BoardTranslator):
+class InstanceTranslator(CnfTranslator):
     """Translator of sudoku instances."""
 
     def _cell_to_literal(self, cell: Cell) -> Literal:
@@ -222,13 +217,14 @@ class InstanceTranslator(BoardTranslator):
             Literal: the equivalent literal.
         """
 
-        return self._coord_to_literal(cell.row, cell.col, cell.value)
+        return self._coord_to_literal(cell.row, cell.col, cell.value - 1)
 
     def _translate_instance(self) -> None:
         """Translate all the values already present in the board into constraints."""
 
         for cell in self._board.get_cells():
-            self.result.append([self._cell_to_literal(cell)])
+            if cell.value != 0:
+                self.result.append([self._cell_to_literal(cell)])
 
     def translate(self, board: Board) -> Formula:
         """Translate the given game instance into the equivalent CNF formula.
