@@ -207,46 +207,6 @@ class RulesTranslator(CnfTranslator):
         return self.result
 
 
-class InstanceTranslator(CnfTranslator):
-    """Translator of sudoku instances."""
-
-    def _cell_to_literal(self, cell: Cell) -> Literal:
-        """Translate the given cell into literal.
-
-        Args:
-            cell (Cell): cell to translate.
-
-        Returns:
-            Literal: the equivalent literal.
-        """
-
-        return self._coord_to_literal(cell.row, cell.col, cell.value - 1)
-
-    def _translate_instance(self) -> None:
-        """Translate all the values already present in the board into constraints."""
-
-        for cell in self._board.get_cells():
-            if cell.value != 0:
-                self.result.append([self._cell_to_literal(cell)])
-
-    def translate(self, board: Board) -> Formula:
-        """Translate the given game instance into the equivalent CNF formula.
-
-        Args:
-            board (Board): board to translate.
-
-        Returns:
-            Formula: a CNF formula equivalent to the instance of the board given.
-        """
-
-        self._board = board
-        self.result = []
-
-        self._translate_instance()
-
-        return self.result
-
-
 class ResultTranslator(Translator):
     """Translator of sat solver results into sudoku boards."""
 
@@ -260,7 +220,14 @@ class ResultTranslator(Translator):
             Tuple[int, int, int]: the equivalent coordinates.
         """
 
-        pass
+        row_coefficent = Board.N_COLS * Board.VALUE_RANGE[1]
+        col_coefficent = Board.VALUE_RANGE[1]
+
+        row = literal // row_coefficent
+        col = (literal - (row * row_coefficent)) // col_coefficent
+        value = literal - (col * col_coefficent) - (row * row_coefficent)
+
+        return (row, col, value + 1)
 
     def _translate_sat_result(self) -> List[List[int]]:
         """Translate the sat result into a matrix of numbers.
@@ -269,7 +236,15 @@ class ResultTranslator(Translator):
             List[List[int]]: the matrix equivalent to the sat result given.
         """
 
-        pass
+        matrix = [list() for _ in range(0, Board.N_ROWS)]
+        for row in matrix:
+            row = [0 for _ in range(0, Board.N_COLS)]
+
+        for literal in self._result:
+            row, col, value = self._literal_to_coord(literal)
+            matrix[row][col] = value
+
+        return matrix
 
     def translate(self, sat_result: List[Literal]) -> Board:
         """Translate the given sat result into the equivalent board.
@@ -281,4 +256,7 @@ class ResultTranslator(Translator):
             Board: a board equivalent to the sat result given.
         """
 
-        pass
+        self._result = sat_result
+        self.board = Board.from_matrix(self._translate_sat_result())
+
+        return self.board
