@@ -15,6 +15,7 @@ class TranslatorType(Enum):
 
     GameRules = "rules"
     SudokuInstance = "instance"
+    SudokuResult = "result"
 
 
 class Translator(ABC):
@@ -36,6 +37,8 @@ class Translator(ABC):
             return RulesTranslator()
         elif type == TranslatorType.SudokuInstance:
             return InstanceTranslator()
+        elif type == TranslatorType.SudokuResult:
+            return ResultTranslator()
 
     @abstractmethod
     def translate(self, obj: object) -> object:
@@ -242,3 +245,40 @@ class InstanceTranslator(CnfTranslator):
         self._translate_instance()
 
         return self.result
+
+
+class ResultTranslator(Translator):
+    """Translator of sat solver results into sudoku boards."""
+
+    def _literal_to_coord(self, literal: Literal) -> Tuple[int, int, int]:
+        """Translate the given literal into matrix coordinates.
+
+        Args:
+            literal (Literal): literal to translate.
+
+        Returns:
+            Tuple[int, int, int]: the equivalent coordinates.
+        """
+
+        pass
+
+    def _translate_sat_result(self) -> List[List[int]]:
+        """Translate the sat result into a matrix of numbers.
+
+        Returns:
+            List[List[int]]: the matrix equivalent to the sat result given.
+        """
+
+        pass
+
+    def translate(self, sat_result: List[Literal]) -> Board:
+        """Translate the given sat result into the equivalent board.
+
+        Args:
+            sat_result (List[Literal]): sat result to translate.
+
+        Returns:
+            Board: a board equivalent to the sat result given.
+        """
+
+        pass
