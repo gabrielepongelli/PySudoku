@@ -8,3 +8,9 @@ class InvalidCellValueError(SudokuError, ValueError):
     """Exception raised when trying to set a wrong value to a cell."""
 
     pass
+
+
+class NoSolutionError(SudokuError):
+    """Exception raised when a board has no solutions."""
+
+    pass
