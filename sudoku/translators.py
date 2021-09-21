@@ -1,8 +1,8 @@
-from typing import List, Tuple, NewType
+from typing import List, Tuple, NewType, Callable
 from math import sqrt
 from abc import ABC, abstractmethod
 from enum import Enum
-from board import Cell, Board
+from .board import Cell, Board
 
 
 Literal = NewType("Literal", int)
@@ -81,7 +81,7 @@ class CnfTranslator(Translator):
 
         col_coefficent = self._board.VALUE_RANGE[1]
         row_coefficent = col_coefficent * self._board.N_COLS
-        return value + (col_coefficent * col) + (row_coefficent * row)
+        return value + (col_coefficent * col) + (row_coefficent * row) + 1
 
     @abstractmethod
     def translate(self, board: Board) -> Formula:
@@ -96,7 +96,7 @@ class RulesTranslator(CnfTranslator):
         range_first: Range,
         range_second: Range,
         range_variable: Range,
-        map_to_coord: function,
+        map_to_coord: Callable,
     ) -> None:
         """Pattern for the uniqueness.
 
@@ -104,7 +104,7 @@ class RulesTranslator(CnfTranslator):
             range_first (Range): range of the first parameter.
             range_second (Range): range of the second parameter.
             range_variable (Range): range of the variable parameter.
-            map_to_literal (function): function that map the tuple
+            map_to_literal (Callable): function that map the tuple
             (first, second, var) in to the appropriate order for the
             translation into literals.
         """
@@ -121,12 +121,12 @@ class RulesTranslator(CnfTranslator):
 
                 # only one value must be true
                 for i in range(range_variable[0], range_variable[1] - 1):
-                    for j in range(i + 1, range_variable[0]):
+                    for j in range(i + 1, range_variable[1]):
                         not_first = -self._coord_to_literal(
-                            map_to_coord(first, second, i)
+                            *map_to_coord(first, second, i)
                         )
                         not_second = -self._coord_to_literal(
-                            map_to_coord(first, second, j)
+                            *map_to_coord(first, second, j)
                         )
                         self.result.append([not_first, not_second])
 
@@ -169,19 +169,22 @@ class RulesTranslator(CnfTranslator):
     def _squares_constraints(self) -> None:
         """Add to the result formula constraints for the squares values."""
 
-        n_cells_per_square = self._board.N_SQUARES / self._board.N_ROWS
-        row = lambda square: square // sqrt(n_cells_per_square)
-        col = lambda square: square % sqrt(n_cells_per_square)
+        n_cells_per_square = (
+            self._board.N_ROWS * self._board.N_COLS
+        ) // self._board.N_SQUARES
+        n_cell_per_side = int(sqrt(n_cells_per_square))
+        row = lambda square, cell: (
+            ((square // n_cell_per_side) * n_cell_per_side) + (cell // n_cell_per_side)
+        )
+        col = lambda square, cell: (
+            ((square % n_cell_per_side) * n_cell_per_side) + (cell % n_cell_per_side)
+        )
 
         args = {
             "range_first": self._board.VALUE_RANGE,
             "range_second": (0, self._board.N_SQUARES),
             "range_variable": (0, n_cells_per_square),
-            "map_to_coord": lambda x, y, z: (
-                row(y) + (z // n_cells_per_square),
-                col(z) + (z % n_cells_per_square),
-                x,
-            ),
+            "map_to_coord": lambda x, y, z: (row(y, z), col(y, z), x),
         }
 
         self._uniqueness(**args)
@@ -225,9 +228,8 @@ class InstanceTranslator(CnfTranslator):
     def _translate_instance(self) -> None:
         """Translate all the values already present in the board into constraints."""
 
-        for cell in self._board.get_cells():
-            if cell.value != 0:
-                self.result.append([self._cell_to_literal(cell)])
+        for cell in self._board.get_cells(used=True):
+            self.result.append([self._cell_to_literal(cell)])
 
     def translate(self, board: Board) -> Formula:
         """Translate the given game instance into the equivalent CNF formula.
@@ -260,14 +262,15 @@ class ResultTranslator(Translator):
             Tuple[int, int, int]: the equivalent coordinates.
         """
 
-        row_coefficent = Board.N_COLS * Board.VALUE_RANGE[1]
+        literal -= 1
         col_coefficent = Board.VALUE_RANGE[1]
+        row_coefficent = Board.N_COLS * col_coefficent
 
         row = literal // row_coefficent
         col = (literal - (row * row_coefficent)) // col_coefficent
         value = literal - (col * col_coefficent) - (row * row_coefficent)
 
-        return (row, col, value + 1)
+        return (row, col, value)
 
     def _translate_sat_result(self) -> List[List[int]]:
         """Translate the sat result into a matrix of numbers.
@@ -277,12 +280,13 @@ class ResultTranslator(Translator):
         """
 
         matrix = [list() for _ in range(0, Board.N_ROWS)]
-        for row in matrix:
-            row = [0 for _ in range(0, Board.N_COLS)]
+        for i in range(0, len(matrix)):
+            matrix[i] = [0 for _ in range(0, Board.N_COLS)]
 
         for literal in self._result:
-            row, col, value = self._literal_to_coord(literal)
-            matrix[row][col] = value
+            if literal > 0:
+                row, col, value = self._literal_to_coord(literal)
+                matrix[row][col] = value + 1
 
         return matrix
 

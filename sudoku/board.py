@@ -1,5 +1,5 @@
 from typing import List
-from utils import InvalidCellValueError
+from .utils import InvalidCellValueError
 
 
 class Cell:
@@ -84,7 +84,7 @@ class Board:
             Board: the board equivalent to the matrix specified.
         """
 
-        result = cls()
+        result = cls(cls.N_ROWS, cls.N_COLS)
         board = result.rows()
         for i, row in enumerate(board):
             for j, cell in enumerate(row):
@@ -95,15 +95,15 @@ class Board:
     def standard_board(cls) -> "Board":
         pass
 
-    def __init__(self, rows: int, col: int) -> None:
+    def __init__(self, rows: int, cols: int) -> None:
         """Initialize a new Board."""
 
         self._rows = []
         self._cols = []
 
-        for i in range(0, Board.N_ROWS):
+        for i in range(0, rows):
             self._rows.append([])
-            for j in range(0, Board.N_COLS):
+            for j in range(0, cols):
                 # rows
                 cell = Cell(0, i, j)
                 self._rows[i].append(cell)
