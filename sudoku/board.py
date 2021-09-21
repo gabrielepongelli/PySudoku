@@ -84,7 +84,7 @@ class Board:
             Board: the board equivalent to the matrix specified.
         """
 
-        result = cls(cls.N_ROWS, cls.N_COLS)
+        result = cls()
         board = result.rows()
         for i, row in enumerate(board):
             for j, cell in enumerate(row):
@@ -92,18 +92,24 @@ class Board:
         return result
 
     @classmethod
-    def standard_board(cls) -> "Board":
-        pass
+    def empty_board(cls) -> "Board":
+        """Build an empty Board.
 
-    def __init__(self, rows: int, cols: int) -> None:
+        Returns:
+            Board: the new Board created.
+        """
+
+        return cls()
+
+    def __init__(self) -> None:
         """Initialize a new Board."""
 
         self._rows = []
         self._cols = []
 
-        for i in range(0, rows):
+        for i in range(0, self.N_ROWS):
             self._rows.append([])
-            for j in range(0, cols):
+            for j in range(0, self.N_COLS):
                 # rows
                 cell = Cell(0, i, j)
                 self._rows[i].append(cell)
