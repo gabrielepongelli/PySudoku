@@ -276,7 +276,7 @@ class BoardTester:
             board (Board): board to be tested.
         """
 
-        pass
+        self.board = board
 
     def _is_val_used_in_row(self, cell: Cell) -> bool:
         """Check whether the cell value is already used in its row or not.
@@ -288,7 +288,7 @@ class BoardTester:
             bool: True if the cell value has been used in its row.
         """
 
-        pass
+        return cell.value in self.board.rows[cell.row]
 
     def _is_val_used_in_column(self, cell: Cell) -> bool:
         """Check whether the cell value is already used in its col or not.
@@ -300,7 +300,7 @@ class BoardTester:
             bool: True if the cell value has been used in its col.
         """
 
-        pass
+        return cell.value in self.board.cols[cell.col]
 
     def _is_val_used_in_square(self, cell: Cell) -> bool:
         """Check whether the cell value is already used in its square or not.
@@ -312,7 +312,10 @@ class BoardTester:
             bool: True if the cell value has been used in its square.
         """
 
-        pass
+        return (
+            cell.value
+            in self.board.squares[self.board.coord_to_square(cell.row, cell.col)]
+        )
 
     def is_cell_correct(self, cell: Cell) -> bool:
         """Check whether the cell specified follow the sudoku rules or not.
@@ -324,7 +327,13 @@ class BoardTester:
             bool: True if the cell follow the sudoku rules, False otherwise.
         """
 
-        pass
+        if self._is_val_used_in_row(cell):
+            return False
+        elif self._is_val_used_in_column(cell):
+            return False
+        elif self._is_val_used_in_square(cell):
+            return False
+        return True
 
     def is_board_correct(self) -> bool:
         """Check whether every cell in the board follow the sudoku rules or not.
@@ -333,4 +342,7 @@ class BoardTester:
             bool: False if at least one cell doesn't follow the sudoku rules.
         """
 
-        pass
+        for cell in self.board.get_cells(used=True):
+            if not self.is_cell_correct(cell):
+                return False
+        return True
