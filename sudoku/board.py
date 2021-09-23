@@ -1,4 +1,4 @@
-from typing import List, Tuple
+from typing import List, Sequence, Tuple
 from math import sqrt
 from .utils import InvalidCellValueError
 
@@ -278,6 +278,26 @@ class BoardTester:
 
         self.board = board
 
+    @staticmethod
+    def _is_cell_value_present(cell: Cell, seq: Sequence[Cell]) -> bool:
+        """Check if the cell value is already present in the sequence.
+
+        Args:
+            cell (Cell): cell to control.
+            seq (Sequence[Cell]): sequence of cell to use for the control.
+
+        Returns:
+            bool: True if the cell value is found in seq.
+        """
+
+        for c in seq:
+            if c.value == cell.value:
+                return True
+            else:
+                continue
+
+        return False
+
     def _is_val_used_in_row(self, cell: Cell) -> bool:
         """Check whether the cell value is already used in its row or not.
 
@@ -288,7 +308,7 @@ class BoardTester:
             bool: True if the cell value has been used in its row.
         """
 
-        return cell.value in self.board.rows[cell.row]
+        return BoardTester._is_cell_value_present(cell, self.board.rows[cell.row])
 
     def _is_val_used_in_column(self, cell: Cell) -> bool:
         """Check whether the cell value is already used in its col or not.
@@ -300,7 +320,7 @@ class BoardTester:
             bool: True if the cell value has been used in its col.
         """
 
-        return cell.value in self.board.cols[cell.col]
+        return BoardTester._is_cell_value_present(cell, self.board.cols[cell.col])
 
     def _is_val_used_in_square(self, cell: Cell) -> bool:
         """Check whether the cell value is already used in its square or not.
@@ -312,20 +332,23 @@ class BoardTester:
             bool: True if the cell value has been used in its square.
         """
 
-        return (
-            cell.value
-            in self.board.squares[self.board.coord_to_square(cell.row, cell.col)]
+        return BoardTester._is_cell_value_present(
+            cell, self.board.squares[self.board.coord_to_square(cell.row, cell.col)]
         )
 
-    def is_cell_correct(self, cell: Cell) -> bool:
+    def is_cell_correct(self, row: int, col: int, value: int) -> bool:
         """Check whether the cell specified follow the sudoku rules or not.
 
         Args:
-            cell (Cell): cell that has to be controlled.
+            row (int): row of the cell that has to be controlled.
+            col (int): col of the cell that has to be controlled.
+            value (int): value of the cell that has to be controlled.
 
         Returns:
             bool: True if the cell follow the sudoku rules, False otherwise.
         """
+
+        cell = Cell(value, row, col)
 
         if self._is_val_used_in_row(cell):
             return False
@@ -333,16 +356,4 @@ class BoardTester:
             return False
         elif self._is_val_used_in_square(cell):
             return False
-        return True
-
-    def is_board_correct(self) -> bool:
-        """Check whether every cell in the board follow the sudoku rules or not.
-
-        Returns:
-            bool: False if at least one cell doesn't follow the sudoku rules.
-        """
-
-        for cell in self.board.get_cells(used=True):
-            if not self.is_cell_correct(cell):
-                return False
         return True
