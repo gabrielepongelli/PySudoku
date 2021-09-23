@@ -15,7 +15,7 @@ class Solver:
     def create(cls, board: Board) -> "Solver":
         """Create a new Solver that will solve the given board.
 
-        Arguments:
+        Args:
             board (Board): board to assign to the new Solver.
 
         Returns:
@@ -32,7 +32,7 @@ class Solver:
     def _map_sudoku_rules(cls, board: Board) -> Formula:
         """Map the sudoku rules to a valid input for a sat solver.
 
-        Arguments:
+        Args:
             board (Board): board that contains the rules to map.
 
         Returns:
