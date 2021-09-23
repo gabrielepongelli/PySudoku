@@ -22,11 +22,10 @@ class Solver:
             Solver: the new solver created.
         """
 
-        if not hasattr(cls, "_sat_solver"):
-            rules_formula = cls._map_sudoku_rules(board)
-            cls._sat_solver = pysat.Minisat22(bootstrap_with=rules_formula)
+        if not hasattr(cls, "_rules_formula"):
+            cls._rules_formula = cls._map_sudoku_rules(board)
 
-        return cls(board)
+        return cls(board, pysat.Minisat22(bootstrap_with=cls._rules_formula))
 
     @classmethod
     def _map_sudoku_rules(cls, board: Board) -> Formula:
@@ -43,13 +42,15 @@ class Solver:
         formula = tr.translate(board)
         return formula
 
-    def __init__(self, board: Board) -> None:
+    def __init__(self, board: Board, solver: pysat.Solver) -> None:
         """Initialize a new Solver.
 
         Args:
             board (Board): board to solve.
+            solver (pysat.Solver): sat solver to use.
         """
 
+        self._sat_solver = solver
         self._board = board
         self._map_board_to_sat()
 
@@ -57,9 +58,8 @@ class Solver:
         """Map the board instance to a valid input for a sat solver."""
 
         tr = Translator.create(TranslatorType.SudokuInstance)
-        self._board_instance = [
-            literal for prop in tr.translate(self._board) for literal in prop
-        ]
+        formula = tr.translate(self._board)
+        self._sat_solver.append_formula(formula)
 
     def _map_sat_to_board(self, result) -> Board:
         """Map a sat output to a board.
@@ -85,9 +85,7 @@ class Solver:
         """
 
         if self._sat_solver.solve() == True:
-            self._board = self._map_sat_to_board(
-                self._sat_solver.get_model(assumptions=self._board_instance)
-            )
+            self._board = self._map_sat_to_board(self._sat_solver.get_model())
             return self._board
         else:
             raise NoSolutionError("the board specified has no solution.")
@@ -99,5 +97,8 @@ class Solver:
     def __iter__(self):
         """Iterate through all the possible solutions for the board."""
 
-        for solution in self._sat_solver.enum_models(assumptions=self._board_instance):
+        for solution in self._sat_solver.enum_models():
             yield self._map_sat_to_board(solution)
+
+    def __del__(self):
+        self._sat_solver.delete()

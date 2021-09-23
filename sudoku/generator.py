@@ -68,11 +68,10 @@ class Generator:
                 n_solutions += 1
                 if n_solutions > 1:
                     break
-            else:
-                continue
 
-            cell.value = removed_value
-            non_empty_squares_count += 1
+            if n_solutions != 1:
+                cell.value = removed_value
+                non_empty_squares_count += 1
 
     def _generate_full_board(self, tester: BoardTester) -> bool:
         """Generate a new filled board.
