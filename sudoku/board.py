@@ -264,3 +264,73 @@ class Board:
 
     def __repr__(self) -> str:
         return repr(self._rows)
+
+
+class BoardTester:
+    """Test whether the board specified satisfy all the sudoku rules or not."""
+
+    def __init__(self, board: Board) -> None:
+        """Initialize a new BoardTester.
+
+        Args:
+            board (Board): board to be tested.
+        """
+
+        pass
+
+    def _is_val_used_in_row(self, cell: Cell) -> bool:
+        """Check whether the cell value is already used in its row or not.
+
+        Args:
+            cell (Cell): cell that has to be controlled.
+
+        Returns:
+            bool: True if the cell value has been used in its row.
+        """
+
+        pass
+
+    def _is_val_used_in_column(self, cell: Cell) -> bool:
+        """Check whether the cell value is already used in its col or not.
+
+        Args:
+            cell (Cell): cell that has to be controlled.
+
+        Returns:
+            bool: True if the cell value has been used in its col.
+        """
+
+        pass
+
+    def _is_val_used_in_square(self, cell: Cell) -> bool:
+        """Check whether the cell value is already used in its square or not.
+
+        Args:
+            cell (Cell): cell that has to be controlled.
+
+        Returns:
+            bool: True if the cell value has been used in its square.
+        """
+
+        pass
+
+    def is_cell_correct(self, cell: Cell) -> bool:
+        """Check whether the cell specified follow the sudoku rules or not.
+
+        Args:
+            cell (Cell): cell that has to be controlled.
+
+        Returns:
+            bool: True if the cell follow the sudoku rules, False otherwise.
+        """
+
+        pass
+
+    def is_board_correct(self) -> bool:
+        """Check whether every cell in the board follow the sudoku rules or not.
+
+        Returns:
+            bool: False if at least one cell doesn't follow the sudoku rules.
+        """
+
+        pass
