@@ -1,4 +1,5 @@
-from typing import List
+from typing import List, Tuple
+from math import sqrt
 from .utils import InvalidCellValueError
 
 
@@ -72,6 +73,7 @@ class Board:
     N_COLS = 9
     N_SQUARES = 9
     VALUE_RANGE = (0, 9)
+    N_CELLS_PER_SQUARE_SIDE = int(sqrt((N_ROWS * N_COLS) // N_SQUARES))
 
     @classmethod
     def from_matrix(cls, matrix: List[List[int]]) -> "Board":
@@ -85,7 +87,7 @@ class Board:
         """
 
         result = cls()
-        board = result.rows()
+        board = result.rows
         for i, row in enumerate(board):
             for j, cell in enumerate(row):
                 cell.value = matrix[i][j]
@@ -106,6 +108,9 @@ class Board:
 
         self._rows = []
         self._cols = []
+        self._squares = []
+
+        col_per_square = row_per_square = self.N_CELLS_PER_SQUARE_SIDE
 
         for i in range(0, self.N_ROWS):
             self._rows.append([])
@@ -118,6 +123,13 @@ class Board:
                 if i == 0:
                     self._cols.append([])
                 self._cols[j].append(cell)
+
+                # squares
+                if j % col_per_square == 0 and i % row_per_square == 0:
+                    self._squares.append([])
+                self._squares[
+                    (j // col_per_square) + ((i // row_per_square) * col_per_square)
+                ].append(cell)
 
     def get_cells(
         self, used: bool = True, row: int = None, col: int = None
@@ -167,6 +179,7 @@ class Board:
 
         return result
 
+    @property
     def rows(self) -> List[List[Cell]]:
         """Get all the cells by row.
 
@@ -175,6 +188,66 @@ class Board:
         """
 
         return Board._copy_matrix(self._rows)
+
+    @property
+    def cols(self) -> List[List[Cell]]:
+        """Get all the cells by col.
+
+        Returns:
+            List[List[Cell]]: all the cells in the order col[ row ].
+        """
+
+        return Board._copy_matrix(self._cols)
+
+    @property
+    def squares(self) -> List[List[Cell]]:
+        """Get all the cells by squares.
+
+        Get all the cells by squares. Each square is in the format row1, row2, row3.
+
+        Returns:
+            List[List[Cell]]: all the cells grouped into squares.
+        """
+
+        return Board._copy_matrix(self._squares)
+
+    @staticmethod
+    def square_to_coord(square: int, cell: int) -> Tuple[int, int]:
+        """Convert a square and a cell number into (row, col) coordinates.
+
+        Args:
+            square (int): square number to convert.
+            cell (int): cell number inside the square to convert.
+
+        Returns:
+            Tuple[int, int]: a pair (row, col) equivalent to the square and
+            cell numbers given.
+        """
+
+        row = (
+            (square // Board.N_CELLS_PER_SQUARE_SIDE) * Board.N_CELLS_PER_SQUARE_SIDE
+        ) + (cell // Board.N_CELLS_PER_SQUARE_SIDE)
+        col = (
+            (square % Board.N_CELLS_PER_SQUARE_SIDE) * Board.N_CELLS_PER_SQUARE_SIDE
+        ) + (cell % Board.N_CELLS_PER_SQUARE_SIDE)
+
+        return (row, col)
+
+    @staticmethod
+    def coord_to_square(row: int, col: int) -> int:
+        """Convert (row, col) coordinates into the equivalent square number.
+
+        Args:
+            row (int): row to convert.
+            col (int): col to convert.
+
+        Returns:
+            int: square number equivalent to the pair (row, col) given.
+        """
+
+        return (
+            (row // Board.N_CELLS_PER_SQUARE_SIDE) * Board.N_CELLS_PER_SQUARE_SIDE
+        ) + (col // Board.N_CELLS_PER_SQUARE_SIDE)
 
     def to_matrix(self) -> List[List[int]]:
         """Get the matrix representation of the board.

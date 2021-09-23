@@ -1,5 +1,4 @@
 from typing import List, Tuple, NewType, Callable
-from math import sqrt
 from abc import ABC, abstractmethod
 from enum import Enum
 from .board import Cell, Board
@@ -169,21 +168,14 @@ class RulesTranslator(CnfTranslator):
     def _squares_constraints(self) -> None:
         """Add to the result formula constraints for the squares values."""
 
-        n_cells_per_square = (
-            self._board.N_ROWS * self._board.N_COLS
-        ) // self._board.N_SQUARES
-        n_cell_per_side = int(sqrt(n_cells_per_square))
-        row = lambda square, cell: (
-            ((square // n_cell_per_side) * n_cell_per_side) + (cell // n_cell_per_side)
-        )
-        col = lambda square, cell: (
-            ((square % n_cell_per_side) * n_cell_per_side) + (cell % n_cell_per_side)
-        )
+        n_cell_per_side = self._board.N_CELLS_PER_SQUARE_SIDE
+        row = lambda square, cell: self._board.square_to_coord(square, cell)[0]
+        col = lambda square, cell: self._board.square_to_coord(square, cell)[1]
 
         args = {
             "range_first": self._board.VALUE_RANGE,
             "range_second": (0, self._board.N_SQUARES),
-            "range_variable": (0, n_cells_per_square),
+            "range_variable": (0, n_cell_per_side * n_cell_per_side),
             "map_to_coord": lambda x, y, z: (row(y, z), col(y, z), x),
         }
 
