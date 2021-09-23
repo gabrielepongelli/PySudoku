@@ -30,7 +30,15 @@ class Sudoku:
             specified values.
         """
 
-        pass
+        try:
+            difficulty = _Difficulty[difficulty.title()]
+        except KeyError:
+            raise InvalidDifficultyError(
+                f"the difficulty level {difficulty} is not valid."
+            )
+
+        gen = _Generator(difficulty)
+        return gen.generate().to_matrix()
 
     @staticmethod
     def solve(matrix: List[List[int]]) -> List[List[int]]:
@@ -47,4 +55,10 @@ class Sudoku:
             InvalidMatrixError if the matrix passed is malformed or has no solution.
         """
 
-        pass
+        try:
+            b = _Board.from_matrix(matrix)
+        except (InvalidCellValueError, NoSolutionError):
+            raise InvalidMatrixError("the matrix passed is malformed.")
+
+        sol = _Solver.create(b)
+        return sol.solve().to_matrix()
