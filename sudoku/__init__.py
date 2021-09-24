@@ -57,8 +57,9 @@ class Sudoku:
 
         try:
             b = _Board.from_matrix(matrix)
-        except (InvalidCellValueError, NoSolutionError):
-            raise InvalidMatrixError("the matrix passed is malformed.")
+            sol = _Solver.create(b)
+            result = sol.solve().to_matrix()
+        except (InvalidCellValueError, NoSolutionError) as err:
+            raise InvalidMatrixError(*err.args)
 
-        sol = _Solver.create(b)
-        return sol.solve().to_matrix()
+        return result

@@ -47,9 +47,9 @@ class Cell:
             InvalidCellValueError: if value not in [0, 9].
         """
 
-        if new_val < 0 or new_val > 9:
+        if new_val < Board.VALUE_RANGE[0] or new_val > Board.VALUE_RANGE[1]:
             raise InvalidCellValueError(
-                "a cell cannot contains values which are not in [0, 9]."
+                f"a cell cannot contains values which are not in [{Board.VALUE_RANGE[0]}, {Board.VALUE_RANGE[1]}]."
             )
         else:
             self._value = new_val
