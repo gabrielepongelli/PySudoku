@@ -37,7 +37,7 @@ class SudokuSquareWidget(QFrame):
         layout.setContentsMargins(0, 0, 0, 0)
         for i in range(model.Board.N_CELLS_PER_SQUARE_SIDE):
             for j in range(model.Board.N_CELLS_PER_SQUARE_SIDE):
-                layout.addWidget(SudokuCellWidget("a"), i, j)
+                layout.addWidget(SudokuCellWidget("", self), i, j)
         self.setLayout(layout)
 
 
@@ -71,5 +71,5 @@ class SudokuBoardWidget(QFrame):
         layout.setContentsMargins(0, 0, 0, 0)
         for i in range(model.Board.N_CELLS_PER_SQUARE_SIDE):
             for j in range(model.Board.N_CELLS_PER_SQUARE_SIDE):
-                layout.addWidget(SudokuSquareWidget(), i, j)
+                layout.addWidget(SudokuSquareWidget(self), i, j)
         self.setLayout(layout)
