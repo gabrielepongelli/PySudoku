@@ -249,15 +249,19 @@ class Board:
             (row // Board.N_CELLS_PER_SQUARE_SIDE) * Board.N_CELLS_PER_SQUARE_SIDE
         ) + (col // Board.N_CELLS_PER_SQUARE_SIDE)
 
-    def to_matrix(self) -> List[List[int]]:
+    @staticmethod
+    def to_matrix(board: List[List[Cell]]) -> List[List[int]]:
         """Get the matrix representation of the board.
+
+        Args:
+            board (List[List[Cell]]): board to be converted into matrix.
 
         Returns:
             List[List[int]]: the matrix representation.
         """
 
         result = []
-        for row in self._rows:
+        for row in board:
             result.append([cell.value for cell in row])
 
         return result

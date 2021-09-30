@@ -38,7 +38,7 @@ class Sudoku:
             )
 
         gen = _Generator(difficulty)
-        return gen.generate().to_matrix()
+        return _Board.to_matrix(gen.generate().rows)
 
     @staticmethod
     def solve(matrix: List[List[int]]) -> List[List[int]]:
@@ -58,7 +58,7 @@ class Sudoku:
         try:
             b = _Board.from_matrix(matrix)
             sol = _Solver.create(b)
-            result = sol.solve().to_matrix()
+            result = _Board.to_matrix(sol.solve().rows)
         except (InvalidCellValueError, NoSolutionError) as err:
             raise InvalidMatrixError(*err.args)
 
