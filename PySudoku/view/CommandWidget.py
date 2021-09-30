@@ -1,4 +1,4 @@
-from typing import Optional, Dict, Callable, NewType
+from typing import Optional, Dict, List, NewType
 from PyQt5.QtWidgets import (
     QWidget,
     QVBoxLayout,
@@ -9,7 +9,7 @@ from PyQt5.QtWidgets import (
 )
 
 
-Section = NewType("Section", Dict[str, Callable])
+Section = NewType("Section", List[str])
 Menu = NewType("Menu", Dict[str, Section])
 
 
@@ -30,7 +30,7 @@ class CommandWidget(QWidget):
 
         super().__init__(parent)
 
-        self.commands = commands
+        self._commands = commands
         layout = self._generateButtons()
         verticalSpacer = QSpacerItem(20, 40, QSizePolicy.Minimum, QSizePolicy.Expanding)
         layout.addItem(verticalSpacer)
@@ -46,14 +46,15 @@ class CommandWidget(QWidget):
             QVBoxLayout: the resulting layout.
         """
 
+        self.command_buttons = {}
         verticalLayout = QVBoxLayout()
 
-        for n, section in enumerate(self.commands.values()):
-            for name, action in section.items():
+        for n, section in enumerate(self._commands.values()):
+            for name in section:
                 button = QPushButton(name, self)
-                button.clicked.connect(action)
                 verticalLayout.addWidget(button)
-            if n != len(self.commands) - 1:
+                self.command_buttons[name] = button
+            if n != len(self._commands) - 1:
                 separator = QFrame(self)
                 separator.setFrameShape(QFrame.HLine)
                 separator.setFrameShadow(QFrame.Sunken)

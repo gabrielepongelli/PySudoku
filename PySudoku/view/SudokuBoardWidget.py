@@ -32,12 +32,16 @@ class SudokuSquareWidget(QFrame):
         them inside a grid layout.
         """
 
+        self.cells = []
+
         layout = QGridLayout()
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
         for i in range(model.Board.N_CELLS_PER_SQUARE_SIDE):
             for j in range(model.Board.N_CELLS_PER_SQUARE_SIDE):
-                layout.addWidget(SudokuCellWidget("", self), i, j)
+                cell = SudokuCellWidget("", self)
+                layout.addWidget(cell, i, j)
+                self.cells.append(cell)
         self.setLayout(layout)
 
 
@@ -66,10 +70,14 @@ class SudokuBoardWidget(QFrame):
         them inside a grid layout.
         """
 
+        self.squares = []
+
         layout = QGridLayout()
         layout.setSpacing(0)
         layout.setContentsMargins(0, 0, 0, 0)
         for i in range(model.Board.N_CELLS_PER_SQUARE_SIDE):
             for j in range(model.Board.N_CELLS_PER_SQUARE_SIDE):
-                layout.addWidget(SudokuSquareWidget(self), i, j)
+                square = SudokuSquareWidget(self)
+                layout.addWidget(square, i, j)
+                self.squares.append(square)
         self.setLayout(layout)
