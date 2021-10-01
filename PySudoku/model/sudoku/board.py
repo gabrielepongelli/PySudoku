@@ -273,6 +273,9 @@ class Board:
 
         return result
 
+    def __eq__(self, other: "Board") -> bool:
+        return Board.to_matrix(self) == Board.to_matrix(other)
+
     def __repr__(self) -> str:
         return repr(self._rows)
 
