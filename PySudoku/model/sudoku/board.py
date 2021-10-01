@@ -234,20 +234,27 @@ class Board:
         return (row, col)
 
     @staticmethod
-    def coord_to_square(row: int, col: int) -> int:
-        """Convert (row, col) coordinates into the equivalent square number.
+    def coord_to_square(row: int, col: int) -> Tuple[int, int]:
+        """Convert (row, col) coordinates into the equivalent (square, cell) couple.
 
         Args:
             row (int): row to convert.
             col (int): col to convert.
 
         Returns:
-            int: square number equivalent to the pair (row, col) given.
+            Tuple[int, int]: square number and cell number equivalent to the
+            pair (row, col) given.
         """
 
-        return (
+        square = (
             (row // Board.N_CELLS_PER_SQUARE_SIDE) * Board.N_CELLS_PER_SQUARE_SIDE
         ) + (col // Board.N_CELLS_PER_SQUARE_SIDE)
+
+        cell = (
+            (row % Board.N_CELLS_PER_SQUARE_SIDE) * Board.N_CELLS_PER_SQUARE_SIDE
+        ) + (col % Board.N_CELLS_PER_SQUARE_SIDE)
+
+        return (square, cell)
 
     @staticmethod
     def to_matrix(board: List[List[Cell]]) -> List[List[int]]:
@@ -337,7 +344,7 @@ class BoardTester:
         """
 
         return BoardTester._is_cell_value_present(
-            cell, self.board.squares[self.board.coord_to_square(cell.row, cell.col)]
+            cell, self.board.squares[self.board.coord_to_square(cell.row, cell.col)[0]]
         )
 
     def is_cell_correct(self, row: int, col: int, value: int) -> bool:
