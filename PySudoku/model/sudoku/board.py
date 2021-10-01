@@ -274,7 +274,7 @@ class Board:
         return result
 
     def __eq__(self, other: "Board") -> bool:
-        return Board.to_matrix(self) == Board.to_matrix(other)
+        return Board.to_matrix(self.rows) == Board.to_matrix(other.rows)
 
     def __repr__(self) -> str:
         return repr(self._rows)
