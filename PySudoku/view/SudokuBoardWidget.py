@@ -1,6 +1,7 @@
 from typing import Optional
 from PyQt5.QtWidgets import QFrame, QGridLayout, QLabel, QWidget
-from PyQt5.QtGui import QResizeEvent
+from PyQt5.QtGui import QResizeEvent, QMouseEvent
+from PyQt5.QtCore import pyqtSignal
 import PyQt5.QtCore as qtcore
 from .. import model
 
@@ -8,12 +9,19 @@ from .. import model
 class SudokuCellWidget(QLabel):
     """Widget that represent a single Sudoku Cell."""
 
+    mousePressed = pyqtSignal()
+
     def __init__(self, text: str = "", parent: Optional[QWidget] = None) -> None:
         super().__init__(text, parent)
 
         self.setMouseTracking(True)
         self.setFrameShape(QFrame.Shape.Box)
         self.setAlignment(qtcore.Qt.AlignmentFlag.AlignCenter)
+        self.setAutoFillBackground(True)
+
+    def mousePressEvent(self, event: QMouseEvent) -> None:
+        super().mousePressEvent(event)
+        self.mousePressed.emit()  # emit the correspondent signal
 
 
 class SudokuSquareWidget(QFrame):
