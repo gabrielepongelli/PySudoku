@@ -66,22 +66,6 @@ class Game(QObject):
 
     @property
     def solution(self) -> Board:
-        """Get the solution of the current board.
-
-        Get the solution of the current board. If it wasn't computed yet, it
-        will also be calculated.
-
-        Returns:
-            Board: the correct solution to the current board.
-        """
-
-        if self._solution is None:
-            initial_board = Board.from_matrix(Board.to_matrix(self._board.rows))
-            for row, col in self._editable_values.keys():
-                initial_board.rows[row][col].value = 0
-            self._solution = Board.from_matrix(
-                Sudoku.solve(Board.to_matrix(initial_board.rows))
-            )
         return self._solution
 
     @solution.setter
