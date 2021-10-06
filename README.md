@@ -45,7 +45,7 @@ The code of this project is compatible with Linux, MacOS and Windows.
 
 ### Prerequisites
 
-To be able to use this project you need python3 installed.
+To be able to use this project you need at least python 3.5 installed.
 
 ### Installation
 
