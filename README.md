@@ -49,6 +49,25 @@ To be able to use this project you need at least python 3.5 installed.
 
 ### Installation
 
+On Windows:
+1. Clone the repo
+   ```sh
+   git clone https://github.com/gabrielepongelli/PySudoku.git && cd PySudoku
+   ```
+2. Create a python virtual environment
+   ```sh
+   Python -m venv env
+   ```
+3. Activate the virtual environment<br>
+   ```powershell
+   PS env\Scripts\Activate.ps1
+   ```
+4. Install the project requirements
+   ```sh
+   Python -m pip install -r requirements.txt
+   ```
+
+On MacOS/Linux:
 1. Clone the repo
    ```sh
    git clone https://github.com/gabrielepongelli/PySudoku.git && cd PySudoku
@@ -58,11 +77,6 @@ To be able to use this project you need at least python 3.5 installed.
    python3 -m venv env
    ```
 3. Activate the virtual environment<br>
-   On Windows:
-   ```powershell
-   PS env\Scripts\Activate.ps1
-   ```
-   On MacOS/Linux:
    ```sh
    source env/bin/activate
    ```
@@ -76,7 +90,13 @@ To be able to use this project you need at least python 3.5 installed.
 
 ## Usage
 
-After completing the [installation procedure](#installation) in order to start the game just execute:
+After completing the [installation procedure](#installation) in order to start the game just execute:<br>
+On Windows:
+```sh
+Python main.py
+```
+
+On MacOS/Linux:
 ```sh
 python3 main.py
 ```
