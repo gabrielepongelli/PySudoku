@@ -79,7 +79,7 @@ class Controller:
         if not self._is_saved:
             self._model.not_saved.emit(True)
             self._is_saved = True
-        if is_difficulty_setted:
+        if is_difficulty_setted and self._model.difficulty != "":
             self._filename = ""
             self._is_saved = False
             self._model.board = Board.from_matrix(
@@ -100,13 +100,26 @@ class Controller:
             initial_board.rows[row][col].value = 0
         return Board.from_matrix(Sudoku.solve(Board.to_matrix(initial_board.rows)))
 
+    def get_solution(self) -> Board:
+        """Get the solution of the actual board.
+
+        Get the solution of the actual board. If the solution isn't present,
+        it will be calculated.
+
+        Returns:
+            Board: the solution of the actual board.
+        """
+
+        if self._model.solution is None:
+            solution = self._calculate_solution()
+            self._model.solution = solution
+
+        return solution
+
     def autosolve(self):
         """Action to perform when the user want to know the solution."""
 
-        solution = self._model.solution
-        if solution is None:
-            solution = self._calculate_solution()
-            self._model.solution = solution
+        solution = self.get_solution()
         self._model.board = solution
 
     def hint(self):
@@ -114,7 +127,7 @@ class Controller:
 
         possible_hints = self._model.board.get_cells(used=False)
         shuffle(possible_hints)
-        solution = self._model.solution
+        solution = self.get_solution()
         for cell in possible_hints:
             correct_value = solution.rows[cell.row][cell.col].value
             if cell.value != correct_value:
@@ -128,7 +141,7 @@ class Controller:
         """Action to perform when the user want to check if his solution is
         correct or not."""
 
-        is_correct = self._model.solution == self._model.board
+        is_correct = self.get_solution() == self._model.board
         self._model.is_board_correct.emit(is_correct)
 
     def key_pressed(self, value: int, selected_cell: Tuple[int, int]):

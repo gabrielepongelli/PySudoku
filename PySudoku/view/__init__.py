@@ -75,6 +75,9 @@ class MainWindow(QMainWindow):
         }
         self._ui = MainWidget(name, menu_voices)
         self._ui.setup(self)
+        self._ui.commands.command_buttons["Hint"].setEnabled(False)
+        self._ui.commands.command_buttons["Auto-solve"].setEnabled(False)
+        self._ui.commands.command_buttons["Check"].setEnabled(False)
         self._cell_selected = None
 
         menu_commands = {
@@ -196,6 +199,11 @@ class MainWindow(QMainWindow):
             coord (Tuple[int, int]): couple of coord (square, cell) of the
             square to update.
         """
+
+        if self._model.board is not None:
+            self._ui.commands.command_buttons["Hint"].setEnabled(True)
+            self._ui.commands.command_buttons["Auto-solve"].setEnabled(True)
+            self._ui.commands.command_buttons["Check"].setEnabled(True)
 
         square, cell = coord
         self.on_cell_clicked(square, cell)
