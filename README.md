@@ -52,7 +52,10 @@ To be able to use this project you need at least python 3.5 installed.
 On Windows:
 1. Clone the repo
    ```powershell
-   (git clone https://github.com/gabrielepongelli/PySudoku.git) -and (cd .\PySudoku\)
+   git clone https://github.com/gabrielepongelli/PySudoku.git
+   ```
+   ```powershell
+   cd .\PySudoku\
    ```
 2. Create a python virtual environment
    ```powershell
