@@ -138,21 +138,29 @@ class MainWindow(QMainWindow):
         else:
             return str(value)
 
-    def _set_cell_selected_color(self, selected: bool, square: int, cell: int) -> None:
-        """Change the cell background color when selected and deselected.
+    def _set_cell_color(
+        self, square: int, cell: int, selected: bool, editable: bool = False
+    ) -> None:
+        """Change the cell background color.
 
         Args:
-            selected (bool): indicate whether the cell specified is selected or not.
             square (int): square number of the cell to modify.
             cell (int): cell number of the cell to modify.
+            selected (bool): indicate whether the cell specified is selected or not.
+            editable (bool, optional): indicate whether the cell specified is
+            editable or not. Defaults to False.
         """
 
         cell = self._ui.board.squares[square].cells[cell]
         palette = cell.palette()
-        if selected:
+        if selected:  # Selected cell color
             color = palette.highlight().color()
         else:
-            color = self._ui.palette().window().color()
+            if editable:  # Unselected editable cell color
+                color = self._ui.palette().window().color()
+            else:  # Unselected non-editable cell color
+                color = palette.dark().color()
+
         palette.setColor(QPalette.Background, color)
         cell.setPalette(palette)
 
@@ -187,9 +195,10 @@ class MainWindow(QMainWindow):
         """
 
         if self._cell_selected is not None:
-            self._set_cell_selected_color(False, *self._cell_selected)
+            was_editable = self._cell_selected in self._model.editable_values
+            self._set_cell_color(*self._cell_selected, False, was_editable)
         self._cell_selected = (square, cell)
-        self._set_cell_selected_color(True, square, cell)
+        self._set_cell_color(square, cell, True)
 
     @pyqtSlot(tuple)
     def on_cell_changed(self, coord: Tuple[int, int]) -> None:
