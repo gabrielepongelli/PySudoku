@@ -82,7 +82,7 @@ class Game(QObject):
         for i, square in enumerate(self._board.squares):
             for j, cell in enumerate(square):
                 if cell.value == 0:
-                    self._editable_values.add((cell.row, cell.col))
+                    self._editable_values.add(Board.coord_to_square(cell.row, cell.col))
                 self.cell_changed.emit((i, j))
 
     def change_cell_value(self, value: int, square: int, cell: int) -> None:
@@ -98,7 +98,7 @@ class Game(QObject):
 
         row, col = Board.square_to_coord(square, cell)
 
-        if (row, col) in self._editable_values:
+        if (square, cell) in self._editable_values:
             self._board.rows[row][col].value = value
             self.cell_changed.emit((square, cell))
         else:

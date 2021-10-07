@@ -96,8 +96,8 @@ class Controller:
         """
 
         initial_board = Board.from_matrix(Board.to_matrix(self._model.board.rows))
-        for row, col in self._model.editable_values:
-            initial_board.rows[row][col].value = 0
+        for square, cell in self._model.editable_values:
+            initial_board.squares[square][cell].value = 0
         return Board.from_matrix(Sudoku.solve(Board.to_matrix(initial_board.rows)))
 
     def _get_solution(self) -> Board:
