@@ -1,6 +1,6 @@
 from random import shuffle
 from enum import IntEnum
-from .board import Board, BoardTester
+from .board import Board
 from .workers import Worker, WorkerType
 
 
@@ -50,37 +50,11 @@ class Generator:
         minimizer = Worker.create(WorkerType.Minimizer, self._board)
         return minimizer.resolve()
 
-    def _generate_full_board(self, tester: BoardTester) -> bool:
-        """Generate a new filled board.
-        Args:
-            tester (BoardTester): tester that will be used to test the
-            correctness of every new cell values.
-        Returns:
-            bool: True when the board is full.
-        """
+    def _generate_full_board(self) -> None:
+        """Generate a new filled board."""
 
-        values = [val for val in range(*self._board.VALUE_RANGE)]
-        n_cells = self._board.N_ROWS * self._board.N_COLS
-        for cell in range(0, n_cells):
-            row = cell // self._board.N_COLS
-            col = cell % self._board.N_ROWS
-
-            # find next empty cell
-            if self._board.rows[row][col].value == 0:
-                shuffle(values)
-                for v in values:
-                    if tester.is_cell_correct(row, col, v + 1):
-                        self._board.rows[row][col].value = v + 1
-                        if not self._board.get_cells(used=False):
-                            return True
-                        else:
-                            if self._generate_full_board(tester):
-                                # if the board is full
-                                return True
-                break
-        # if none of the possible values can be stored backtrack
-        self._board.rows[row][col].value = 0
-        return False
+        solver = Worker.create(WorkerType.Solver, board=None)
+        self._board = solver.resolve()
 
     def _adapt_to_difficulty(self, minimal_board: Board) -> None:
         """Adapt the minimal board to meet the difficulty specified.
@@ -110,8 +84,7 @@ class Generator:
             Board: the new board to complete.
         """
 
-        self._board = Board.empty_board()
-        self._generate_full_board(BoardTester(self._board))
+        self._generate_full_board()
         minimal_board = self._wipe_cells()
         self._adapt_to_difficulty(minimal_board)
 
