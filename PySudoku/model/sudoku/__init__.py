@@ -2,8 +2,8 @@ from typing import List
 from .board import Board as _Board
 from .generator import Generator as _Generator
 from .generator import Difficulty as _Difficulty
-from .solver import Worker as _Worker
-from .solver import WorkerType as _WorkerType
+from .workers import Worker as _Worker
+from .workers import WorkerType as _WorkerType
 from .utils import InvalidDifficultyError
 
 
