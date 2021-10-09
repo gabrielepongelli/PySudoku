@@ -20,9 +20,3 @@ class InvalidDifficultyError(SudokuError, ValueError):
     """Exception raised when trying to create a new board with a wrong difficulty."""
 
     pass
-
-
-class InvalidMatrixError(SudokuError, ValueError):
-    """Exception raised when trying to solve a malformed matrix."""
-
-    pass
