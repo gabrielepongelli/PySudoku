@@ -7,6 +7,8 @@ from PyQt5.QtWidgets import (
     QVBoxLayout,
     QWidget,
     QDialogButtonBox,
+    QFrame,
+    QHBoxLayout,
 )
 import PyQt5.QtCore as qtcore
 
@@ -84,11 +86,20 @@ class DifficultyDialog(SingleOKButtonDialog):
         if layout is None:
             layout = QVBoxLayout()
 
-        self.difficultyComboBox = QComboBox(self)
+        frame = QFrame(self)
+        hblayout = QHBoxLayout(frame)
+        self.label = QLabel("Choose the difficulty: ", frame)
+
+        self.difficultyComboBox = QComboBox(frame)
         self.difficultyComboBox.setInsertPolicy(QComboBox.InsertPolicy.InsertAtBottom)
         self.difficultyComboBox.addItems(difficultyLevels)
         self.difficultyComboBox.setCurrentIndex(-1)
-        layout.addWidget(self.difficultyComboBox)
+
+        hblayout.addWidget(self.label)
+        hblayout.addWidget(self.difficultyComboBox)
+        frame.setLayout(hblayout)
+
+        layout.addWidget(frame)
 
         return layout
 

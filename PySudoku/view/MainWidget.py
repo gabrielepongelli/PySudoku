@@ -7,7 +7,7 @@ from .CommandWidget import CommandWidget, Menu
 class MainWidget(QWidget):
     """Main widget of the application."""
 
-    APP_MIN_SIZE = (526, 400)
+    APP_MIN_SIZE = (788, 600)
 
     def __init__(
         self,
