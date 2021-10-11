@@ -2,13 +2,9 @@ from typing import List
 from .board import Board as _Board
 from .generator import Generator as _Generator
 from .generator import Difficulty as _Difficulty
-from .solver import Solver as _Solver
-from .utils import (
-    InvalidDifficultyError,
-    InvalidCellValueError,
-    InvalidMatrixError,
-    NoSolutionError,
-)
+from .workers import Worker as _Worker
+from .workers import WorkerType as _WorkerType
+from .utils import InvalidDifficultyError
 
 
 class Sudoku:
@@ -55,11 +51,8 @@ class Sudoku:
             InvalidMatrixError if the matrix passed is malformed or has no solution.
         """
 
-        try:
-            b = _Board.from_matrix(matrix)
-            sol = _Solver.create(b)
-            result = _Board.to_matrix(sol.solve().rows)
-        except (InvalidCellValueError, NoSolutionError) as err:
-            raise InvalidMatrixError(*err.args)
+        b = _Board.from_matrix(matrix)
+        sol = _Worker.create(_WorkerType.Solver, b)
+        result = _Board.to_matrix(sol.resolve().rows)
 
         return result
