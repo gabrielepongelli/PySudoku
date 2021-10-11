@@ -176,7 +176,7 @@ class MainWindow(QMainWindow):
         for the new game.
         """
 
-        dialog = DifficultyDialog("Choose difficulty", DIFFICULTY_LEVELS, self)
+        dialog = DifficultyDialog("Difficulty", DIFFICULTY_LEVELS, self)
         dialog.difficultyComboBox.currentTextChanged.connect(
             self._controller.set_difficulty
         )
@@ -248,7 +248,7 @@ class MainWindow(QMainWindow):
         """
 
         if spawn:
-            dialog = WannaSaveDialog("Saving", self)
+            dialog = WannaSaveDialog("Save", self)
             dialog.accepted.connect(self.on_select_file_to_save)
             dialog.exec()
         else:
