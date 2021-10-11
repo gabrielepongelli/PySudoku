@@ -23,7 +23,7 @@ class Worker(ABC):
     """
 
     @classmethod
-    def create(type: WorkerType, board: Board = None) -> "Worker":
+    def create(cls, type: WorkerType, board: Board = None) -> "Worker":
         """Create the desidered worker type.
 
         Args:

@@ -25,6 +25,8 @@ class Translator(ABC):
     that translate something into an equivalent version of something else.
     """
 
+    __literal_tr = None
+
     @classmethod
     def create(cls, type: TranslatorType) -> "Translator":
         """Create the desidered translator type.
@@ -33,15 +35,15 @@ class Translator(ABC):
             type (TranslatorType): the type of translator to generate.
         """
 
-        if not hasattr(cls, "__literal_tr"):
-            cls.__literal_tr = LiteralTranslator()
+        if Translator.__literal_tr is None:
+            Translator.__literal_tr = LiteralTranslator()
 
         if type == TranslatorType.GameRules:
-            return RulesTranslator(cls.__literal_tr)
+            return RulesTranslator(Translator.__literal_tr)
         elif type == TranslatorType.SudokuInstance:
-            return InstanceTranslator(cls.__literal_tr)
+            return InstanceTranslator(Translator.__literal_tr)
         elif type == TranslatorType.SudokuResult:
-            return ResultTranslator(cls.__literal_tr)
+            return ResultTranslator(Translator.__literal_tr)
 
     @abstractmethod
     def translate(self, obj: object) -> object:
@@ -94,7 +96,8 @@ class LiteralTranslator(Translator):
         Randomize the literal values assigned to every cell.
         """
 
-        shuffle(self._all_values)
+        values = self._all_values[:]
+        shuffle(values)
 
         self._randomized_matrix = []
         for i in range(Board.N_ROWS):
@@ -103,9 +106,7 @@ class LiteralTranslator(Translator):
                 start_index = j * Board.VALUE_RANGE[1] + (
                     i * Board.N_COLS * Board.VALUE_RANGE[1]
                 )
-                cell = self._all_values[
-                    start_index : (start_index + Board.VALUE_RANGE[1])
-                ]
+                cell = values[start_index : (start_index + Board.VALUE_RANGE[1])]
                 col.append(cell)
             self._randomized_matrix.append(col)
 
@@ -176,7 +177,7 @@ class CnfTranslator(Translator):
         """Initialize a new BoardTranslator.
 
         Args:
-            literal_tr (LiteralTranslator): ....
+            literal_tr (LiteralTranslator): trasnslator for literal values to use.
         """
 
         super().__init__()
@@ -192,10 +193,10 @@ class CnfTranslator(Translator):
 class RulesTranslator(CnfTranslator):
     """Translator of sudoku rules."""
 
-    def __init__(self) -> None:
-        super().__init__()
+    def __init__(self, literal_tr: LiteralTranslator) -> None:
+        super().__init__(literal_tr)
 
-        self._max_literal_value = 0
+        self._max_literal_value = self._literal_tr.max_problem_variable
         self._literal_tr.randomize_values()
 
     def _uniqueness(
@@ -335,6 +336,12 @@ class ResultTranslator(Translator):
     """Translator of sat solver results into sudoku boards."""
 
     def __init__(self, literal_tr: LiteralTranslator) -> None:
+        """Initialize a new ResultTranslator.
+
+        Args:
+            literal_tr (LiteralTranslator): trasnslator for literal values to use.
+        """
+
         super().__init__()
 
         self._literal_tr = literal_tr
