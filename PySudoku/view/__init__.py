@@ -1,11 +1,41 @@
+import os
+import ctypes
+import platform
 from typing import Optional, Dict, Tuple, Callable
 from PyQt5.QtWidgets import QFileDialog, QMainWindow, QWidget
 from PyQt5.QtCore import pyqtSlot, pyqtSignal
-from PyQt5.QtGui import QKeyEvent, QPalette
+from PyQt5.QtGui import QKeyEvent, QPalette, QIcon
 from .MainWidget import MainWidget
 from .DialogWidgets import DifficultyDialog, ResultDialog, WannaSaveDialog
 from ..controller import Controller
 from ..model import Game, DIFFICULTY_LEVELS
+
+
+def get_app_icon_path() -> str:
+    """Get the path of the app icon.
+
+    Returns:
+        str: the right relative path.
+    """
+
+    os_dir = "windows" if platform.system() == "Windows" else "others"
+
+    scriptDir = os.path.dirname(os.path.realpath(__file__))
+    icon_path = (
+        scriptDir
+        + os.path.sep
+        + ".."
+        + os.path.sep
+        + "resources"
+        + os.path.sep
+        + "icons"
+        + os.path.sep
+        + os_dir
+        + os.path.sep
+        + "AppIcon.ico"
+    )
+
+    return icon_path
 
 
 def get_menu_options(controller: Controller) -> Dict:
@@ -84,6 +114,14 @@ class MainWindow(QMainWindow):
             key: val for section in menu.values() for key, val in section.items()
         }
         self._connect_signals(menu_commands)
+
+        # Necessary in order to make the app icon work prperly on windows
+        if platform.system() == "Windows":
+            ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(
+                u"gabrielepongelli.pysudoku.pysudoku.1"
+            )
+
+        self.setWindowIcon(QIcon(get_app_icon_path()))
 
     def _connect_signals(self, menu: Dict[str, Callable]) -> None:
         """Connect all the signals to the appropriate slots.
