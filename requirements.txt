@@ -1,9 +1,13 @@
+altgraph==0.17.2
 attrs==20.3.0
 bidict==0.21.3
 funcy==1.16
+macholib==1.15.2
 parsimonious==0.8.1
 py-aiger==6.1.14
 py-aiger-cnf==5.0.2
+pyinstaller==4.5.1
+pyinstaller-hooks-contrib==2021.3
 pypblib==0.0.4
 PyQt5==5.15.4
 PyQt5-Qt5==5.15.2
