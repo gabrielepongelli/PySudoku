@@ -1,9 +1,6 @@
 !include MUI2.nsh
 !include FileFunc.nsh
-!define MUI_ICON "###ICON###"
-!define MUI_UNICON "###ICON###"
 
-!getdllversion "###APP###" ver
 !define VERSION "###VERSION###"
 
 VIProductVersion "${VERSION}"
@@ -60,10 +57,6 @@ FunctionEnd
   !insertmacro MUI_PAGE_DIRECTORY
   !insertmacro MUI_PAGE_INSTFILES
     !define MUI_FINISHPAGE_NOAUTOCLOSE
-    !define MUI_FINISHPAGE_RUN
-    !define MUI_FINISHPAGE_RUN_CHECKED
-    !define MUI_FINISHPAGE_RUN_TEXT "Run ###APP_NAME###"
-    !define MUI_FINISHPAGE_RUN_FUNCTION "LaunchAsNonAdmin"
   !insertmacro MUI_PAGE_FINISH
   !insertmacro MUI_UNPAGE_CONFIRM
   !insertmacro MUI_UNPAGE_INSTFILES
@@ -82,7 +75,7 @@ FunctionEnd
   "Software\Microsoft\Windows\CurrentVersion\Uninstall\###APP_NAME###"
 Section
   SetOutPath "$InstDir"
-  File /r "###APP###/*"
+  File /r "###APP###\*"
   WriteRegStr SHCTX "Software\###APP_NAME###" "" $InstDir
   WriteUninstaller "$InstDir\uninstall.exe"
   CreateShortCut "$SMPROGRAMS\###APP_NAME###.lnk" "$InstDir\###APP_NAME###.exe"
