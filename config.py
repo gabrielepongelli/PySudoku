@@ -3,6 +3,10 @@ import platform
 import os
 from typing import Any, Dict
 
+def log(*args, **kwargs):
+    with open("/Users/gabrielepongelli/Desktop/log.txt", "w") as f:
+        f.write(f"{args}{kwargs}")
+
 
 def get_extension(icon: bool = False, installer: bool = False) -> str:
     """Get the right extension for the file specified.
@@ -37,7 +41,27 @@ class Config:
             stored. Defaults to "config.yml".
         """
 
-        self._config = yaml.safe_load(open(config_file, "r"))
+        self._config = self._read_config(config_file)
+    
+    def _read_config(self, config_file: str) -> Dict[str, str]:
+        """Load configutayions from file the config file.
+
+        Args:
+            config_file (str): file where the configurations are stored.
+
+        Returns:
+            Dict[str, str]: the configurations read.
+        """
+
+        try:
+            result = yaml.safe_load(open(config_file, "r"))
+        except:
+            # if on macos it could be an alias, so if we are in the .app bundle it will be in ../Resources
+            if platform.system() == "Darwin":
+                config_file = os.path.dirname(os.path.realpath(__file__)) + os.sep + ".." + os.sep + "Resources" + os.sep + config_file
+                result = yaml.safe_load(open(config_file, "r"))
+        
+        return result
 
     def get_property(self, property_name: str) -> Any:
         """Get the value of the specified property.

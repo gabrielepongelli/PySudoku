@@ -96,10 +96,15 @@ if __name__ == "__main__":
     app_icon = (
         conf.app_icon["path"] + conf.app_icon["name"] + conf.app_icon["extension"]
     )
-    app_icon_dest_path = (
-        "."
-        + conf.app_icon["path"].split(os.path.dirname(os.path.realpath(__file__)))[1]
-    )
+    if platform.system() == "Windows":
+        app_icon_dest_path = (
+            "."
+            + conf.app_icon["path"].split(
+                os.path.dirname(os.path.realpath(__file__))
+            )[1]
+        )
+    else:
+        app_icon_dest_path = "." + os.sep
     subprocess.run(
         f"pyinstaller {conf.entrypoint} -w -y -n {conf.app_name} -i {app_icon} --add-data={app_icon + separator + app_icon_dest_path} --add-data=config.yml{separator + '.' + os.sep}",
         shell=True,
